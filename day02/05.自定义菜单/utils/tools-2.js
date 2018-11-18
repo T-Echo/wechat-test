@@ -9,7 +9,7 @@ module.exports = {
 
   //调用获取用户消息的函数，让返回值是promise对象
   getUserDataAsync (req) {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       //定义一个变量接收数据
       let result = '';
       //给req绑定data、end事件，用来获取微信服务器转发的用户消息

@@ -4,6 +4,8 @@
 const express = require('express');
 const sha1 = require('sha1');
 const {getUserDataAsync,parseXMLDataAsync,formatMessage} = require('./utils/tools-2');
+const reply = require('./reply/reply-2');
+const template = require('./reply/template-2');
 const app = express();
 
 const config = {
@@ -48,26 +50,10 @@ app.use(async (req,res,next) => {
     //message接收的是formatMassage函数的返回值（格式化完的数据----用户发送的消息）
     const message = formatMessage(jsData);
 
-    //初始化一个消息文本
-    let content = '你说啥，听不懂';
-
-    //判断用户发送的消息内容，根据内容返回特定的响应
-    if (message.Content === '1'){
-      content = '大吉大利，今晚吃鸡';
-    }else if (message.Content === '2'){
-      content = '落地成盒';
-    }else if(message.Content === '3'){
-      content = '伏地能手';
-    };
-
-    //将消息文本转成xml格式
-    let replayMessage = `<xml>
-        <ToUserName><![CDATA[${message.FromUserName}]]></ToUserName>
-        <FromUserName><![CDATA[${message.ToUserName}]]></FromUserName>
-        <CreateTime>${Date.now()}</CreateTime>
-        <MsgType><![CDATA[text]]></MsgType>
-        <Content><![CDATA[${content}]]></Content>
-      </xml>`
+    //将用户的消息作为参数传入响应用户消息内容的函数
+    const options = reply(message);
+    //将响应的内容作为参数传入 最终给微信服务器的消息模板函数
+    const replayMessage = template(options);
 
     //将xml格式的消息文本返回响应给微信服务器
     res.send(replayMessage);
